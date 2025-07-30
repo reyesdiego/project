@@ -1,0 +1,16 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=GoLand
+
+###
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+###
+GET http://localhost:3001/api/dashboard/score-types-distribution
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MzczNTgzMywiZXhwIjoxNzUzODIyMjMzfQ.ZpT7wsegn6WDb9kwXqEYWjE-lth1pStRlTD59Y3guFc
