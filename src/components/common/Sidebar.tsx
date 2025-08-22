@@ -10,7 +10,8 @@ import {
   Settings, 
   Menu,
   X,
-  Home
+  Home,
+  TrendingUp
 } from 'lucide-react';
 import { RootState } from '../../store/store';
 import clsx from 'clsx';
@@ -22,6 +23,7 @@ const Sidebar: React.FC = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home, allowedRoles: ['admin', 'evaluador', 'visualizador'] },
+    { name: 'Puntos por Agente', href: '/agent-points', icon: TrendingUp, allowedRoles: ['admin', 'evaluador', 'visualizador'] },
     { name: 'Agentes', href: '/agents', icon: UserCheck, allowedRoles: ['admin', 'evaluador'] },
     { name: 'Tipos de Puntaje', href: '/score-types', icon: Trophy, allowedRoles: ['admin'] },
     { name: 'Asignar Puntajes', href: '/assign-scores', icon: ClipboardList, allowedRoles: ['admin', 'evaluador'] },

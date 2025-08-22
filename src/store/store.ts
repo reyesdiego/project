@@ -6,6 +6,7 @@ import usersSlice from './slices/usersSlice';
 import scoreTypesSlice from './slices/scoreTypesSlice';
 import scoresSlice from './slices/scoresSlice';
 import dashboardSlice from './slices/dashboardSlice';
+import agentPointsSlice from './slices/agentPointsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     scoreTypes: scoreTypesSlice,
     scores: scoresSlice,
     dashboard: dashboardSlice,
+    agentPoints: agentPointsSlice,
   },
 });
 

@@ -4,6 +4,7 @@ import { store } from './store/store';
 import Layout from './components/common/Layout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import AgentPointsDashboardPage from './pages/AgentPointsDashboardPage';
 import AgentsPage from './pages/AgentsPage';
 import ScoreTypesPage from './pages/ScoreTypesPage';
 import AssignScoresPage from './pages/AssignScoresPage';
@@ -20,6 +21,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="agent-points" element={<AgentPointsDashboardPage />} />
             <Route path="agents" element={<AgentsPage />} />
             <Route path="score-types" element={<ScoreTypesPage />} />
             <Route path="assign-scores" element={<AssignScoresPage />} />
