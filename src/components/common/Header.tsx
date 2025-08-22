@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sun, Moon, LogOut, Bell, Settings } from 'lucide-react';
 import { RootState, AppDispatch } from '../../store/store';
 import { toggleTheme } from '../../store/slices/themeSlice';
-import { logout } from '../../store/slices/authSlice';
+import { logoutUser } from '../../store/slices/authSlice';
 
 const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   const { isDarkMode } = useSelector((state: RootState) => state.theme);
 
   const handleLogout = async () => {
-    await dispatch(logout());
+    await dispatch(logoutUser());
     navigate('/login');
   };
 

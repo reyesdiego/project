@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import { getUsers, createUser as createUserApi, updateUser as updateUserApi, deleteUser as deleteUserApi } from '../../services/api';
 
 interface User {
   id: string;
@@ -29,10 +29,10 @@ export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/users');
-      return response.data;
+      const users = await getUsers();
+      return users;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
+      return rejectWithValue(error.message || 'Failed to fetch users');
     }
   }
 );
@@ -41,10 +41,10 @@ export const createUser = createAsyncThunk(
   'users/createUser',
   async (userData: Partial<User> & { password: string }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/users', userData);
-      return response.data.user;
+      const user = await createUserApi(userData);
+      return user;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to create user');
+      return rejectWithValue(error.message || 'Failed to create user');
     }
   }
 );
@@ -53,10 +53,10 @@ export const updateUser = createAsyncThunk(
   'users/updateUser',
   async ({ id, ...userData }: Partial<User> & { id: string }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/users/${id}`, userData);
-      return response.data.user;
+      const user = await updateUserApi(id, userData);
+      return user;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update user');
+      return rejectWithValue(error.message || 'Failed to update user');
     }
   }
 );
@@ -65,10 +65,10 @@ export const deleteUser = createAsyncThunk(
   'users/deleteUser',
   async (id: string, { rejectWithValue }) => {
     try {
-      await api.delete(`/users/${id}`);
+      await deleteUserApi(id);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete user');
+      return rejectWithValue(error.message || 'Failed to delete user');
     }
   }
 );

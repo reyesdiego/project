@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import { getAgents, createAgent as createAgentApi, updateAgent as updateAgentApi, deleteAgent as deleteAgentApi } from '../../services/api';
 
 interface Agent {
   id: string;
@@ -31,10 +31,10 @@ export const fetchAgents = createAsyncThunk(
   'agents/fetchAgents',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/agents');
-      return response.data;
+      const agents = await getAgents();
+      return agents;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch agents');
+      return rejectWithValue(error.message || 'Failed to fetch agents');
     }
   }
 );
@@ -43,10 +43,10 @@ export const createAgent = createAsyncThunk(
   'agents/createAgent',
   async (agentData: Partial<Agent>, { rejectWithValue }) => {
     try {
-      const response = await api.post('/agents', agentData);
-      return response.data.agent;
+      const agent = await createAgentApi(agentData);
+      return agent;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to create agent');
+      return rejectWithValue(error.message || 'Failed to create agent');
     }
   }
 );
@@ -55,10 +55,10 @@ export const updateAgent = createAsyncThunk(
   'agents/updateAgent',
   async ({ id, ...agentData }: Partial<Agent> & { id: string }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/agents/${id}`, agentData);
-      return response.data.agent;
+      const agent = await updateAgentApi(id, agentData);
+      return agent;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update agent');
+      return rejectWithValue(error.message || 'Failed to update agent');
     }
   }
 );
@@ -67,10 +67,10 @@ export const deleteAgent = createAsyncThunk(
   'agents/deleteAgent',
   async (id: string, { rejectWithValue }) => {
     try {
-      await api.delete(`/agents/${id}`);
+      await deleteAgentApi(id);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete agent');
+      return rejectWithValue(error.message || 'Failed to delete agent');
     }
   }
 );

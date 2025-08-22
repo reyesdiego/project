@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Eye, EyeOff } from 'lucide-react';
 import { AppDispatch, RootState } from '../../store/store';
-import { login, clearError } from '../../store/slices/authSlice';
+import { loginUser, clearError } from '../../store/slices/authSlice';
 import Button from '../common/Button';
 
 const LoginForm: React.FC = () => {
@@ -15,7 +15,7 @@ const LoginForm: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -40,7 +40,7 @@ const LoginForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (credentials.username && credentials.password) {
-      await dispatch(login(credentials));
+      await dispatch(loginUser(credentials));
     }
   };
 
@@ -117,13 +117,13 @@ const LoginForm: React.FC = () => {
             </div>
 
             <div className="mt-8">
-              <Button
-                type="submit"
-                size="lg"
-                isLoading={isLoading}
-                disabled={!credentials.username || !credentials.password}
-                className="w-full"
-              >
+                              <Button
+                  type="submit"
+                  size="lg"
+                  isLoading={loading}
+                  disabled={!credentials.username || !credentials.password}
+                  className="w-full"
+                >
                 Iniciar Sesión
               </Button>
             </div>

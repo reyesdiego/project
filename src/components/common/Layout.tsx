@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Outlet, Navigate } from 'react-router-dom';
 import { RootState, AppDispatch } from '../../store/store';
-import { getCurrentUser } from '../../store/slices/authSlice';
+import { fetchCurrentUser } from '../../store/slices/authSlice';
 import { setTheme } from '../../store/slices/themeSlice';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -10,7 +10,7 @@ import LoadingSpinner from './LoadingSpinner';
 
 const Layout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, isLoading, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, loading, user } = useSelector((state: RootState) => state.auth);
   const { isDarkMode } = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
@@ -22,11 +22,11 @@ const Layout: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated && !user) {
-      dispatch(getCurrentUser());
+      dispatch(fetchCurrentUser());
     }
   }, [isAuthenticated, user, dispatch]);
 
-  if (isLoading) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 

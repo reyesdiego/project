@@ -43,7 +43,12 @@ const AssignScoresPage: React.FC = () => {
     setSuccessMessage('');
 
     try {
-      await dispatch(createScore(formData));
+      await dispatch(createScore({
+        ...formData,
+        agent_id: parseInt(formData.agent_id),
+        score_type_id: parseInt(formData.score_type_id),
+        assigned_by: user?.id ? parseInt(user.id) : undefined
+      }));
       setSuccessMessage('Puntaje asignado exitosamente');
       setFormData({
         agent_id: '',

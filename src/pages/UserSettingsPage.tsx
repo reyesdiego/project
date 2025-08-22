@@ -8,7 +8,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const UserSettingsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user, isLoading } = useSelector((state: RootState) => state.auth);
+  const { user, loading } = useSelector((state: RootState) => state.auth);
   
   const [phone, setPhone] = useState(user?.phone || '');
   const [isUpdating, setIsUpdating] = useState(false);
@@ -29,7 +29,7 @@ const UserSettingsPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return <LoadingSpinner className="min-h-96" />;
   }
 

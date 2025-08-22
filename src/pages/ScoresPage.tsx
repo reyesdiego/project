@@ -12,8 +12,8 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 
 interface Score {
   id: string;
-  agent_id: string;
-  score_type_id: string;
+  agent_id: number;
+  score_type_id: number;
   score_date: string;
   comment?: string;
   agent_name?: string;
@@ -29,6 +29,10 @@ const ScoresPage: React.FC = () => {
   const { scoreTypes } = useSelector((state: RootState) => state.scoreTypes);
   const { user } = useSelector((state: RootState) => state.auth);
 
+
+
+
+
   const [filters, setFilters] = useState({
     agent_id: '',
     month: '',
@@ -41,8 +45,8 @@ const ScoresPage: React.FC = () => {
   const [deletingScore, setDeletingScore] = useState<Score | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [formData, setFormData] = useState({
-    agent_id: '',
-    score_type_id: '',
+    agent_id: 0,
+    score_type_id: 0,
     score_date: '',
     comment: '',
   });
@@ -72,10 +76,13 @@ const ScoresPage: React.FC = () => {
   const handleOpenModal = (score?: Score) => {
     if (score) {
       setEditingScore(score);
+      // Extract the date part only (YYYY-MM-DD) for the date input
+      const dateOnly = score.score_date.split('T')[0];
+
       setFormData({
         agent_id: score.agent_id,
         score_type_id: score.score_type_id,
-        score_date: score.score_date,
+        score_date: dateOnly,
         comment: score.comment || '',
       });
     }
@@ -91,7 +98,7 @@ const ScoresPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'agent_id' || name === 'score_type_id' ? parseInt(value) || 0 : value
     }));
   };
 
@@ -100,7 +107,11 @@ const ScoresPage: React.FC = () => {
     
     if (editingScore) {
       try {
-        await dispatch(updateScore({ id: editingScore.id, ...formData }));
+
+        await dispatch(updateScore({ 
+          id: editingScore.id, 
+          ...formData
+        }));
         handleCloseModal();
       } catch (error) {
         console.error('Error updating score:', error);
@@ -338,8 +349,8 @@ const ScoresPage: React.FC = () => {
                       {(score.score_value || 0) > 0 ? '+' : ''}{score.score_value}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(score.score_date).toLocaleDateString()}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">                    {/* {score.score_date ? new Date(score.score_date).toLocaleDateString() : ''} */}
+                    {score.score_date ? score.score_date : ''}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {score.assigned_by_name}

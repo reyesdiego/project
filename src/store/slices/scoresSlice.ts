@@ -1,15 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import { getScores, createScore as createScoreApi, updateScore as updateScoreApi, deleteScore as deleteScoreApi } from '../../services/api';
+import { Score } from '../../lib/supabase';
 
-interface Score {
-  id: string;
-  agent_id: string;
-  score_type_id: string;
-  assigned_by: string;
-  score_date: string;
-  comment?: string;
-  created_at: string;
-  updated_at: string;
+interface ScoreWithNames extends Score {
   agent_name?: string;
   score_type_name?: string;
   score_value?: number;
@@ -17,7 +10,7 @@ interface Score {
 }
 
 interface ScoresState {
-  scores: Score[];
+  scores: ScoreWithNames[];
   pagination: {
     page: number;
     limit: number;
@@ -40,22 +33,51 @@ const initialState: ScoresState = {
   error: null,
 };
 
-interface FetchScoresParams {
-  agent_id?: string;
-  month?: number;
-  year?: number;
-  page?: number;
-  limit?: number;
-}
-
 export const fetchScores = createAsyncThunk(
   'scores/fetchScores',
-  async (params: FetchScoresParams, { rejectWithValue }) => {
+  async (filters: { agent_id?: string; month?: string; year?: string; page?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await api.get('/scores', { params });
-      return response.data;
+      const scores = await getScores();
+      // Transform the data to include the expected properties
+      let transformedScores = scores.map((score: any) => ({
+        ...score,
+        agent_name: score.agent ? `${score.agent.first_name} ${score.agent.last_name}` : 'Unknown',
+        score_type_name: score.score_type?.name || 'Unknown',
+        score_value: score.score_type?.score_value || 0,
+        assigned_by_name: score.assigned_by_user ? `${score.assigned_by_user.first_name} ${score.assigned_by_user.last_name}` : 'Unknown'
+      }));
+
+      // Apply filters
+      if (filters.agent_id) {
+        transformedScores = transformedScores.filter(score => score.agent_id === parseInt(filters.agent_id!));
+      }
+      if (filters.month) {
+        transformedScores = transformedScores.filter(score => new Date(score.score_date).getMonth() + 1 === parseInt(filters.month!));
+      }
+      if (filters.year) {
+        transformedScores = transformedScores.filter(score => new Date(score.score_date).getFullYear() === parseInt(filters.year!));
+      }
+
+      // Calculate pagination
+      const limit = 10; // Items per page
+      const page = filters.page || 1;
+      const total = transformedScores.length;
+      const totalPages = Math.ceil(total / limit);
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedScores = transformedScores.slice(startIndex, endIndex);
+
+      return {
+        scores: paginatedScores,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages
+        }
+      };
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch scores');
+      return rejectWithValue(error.message || 'Failed to fetch scores');
     }
   }
 );
@@ -64,10 +86,18 @@ export const createScore = createAsyncThunk(
   'scores/createScore',
   async (scoreData: Partial<Score>, { rejectWithValue }) => {
     try {
-      const response = await api.post('/scores', scoreData);
-      return response.data.score;
+      const score = await createScoreApi(scoreData);
+      // Transform the returned score to include the expected properties
+      const transformedScore = {
+        ...score,
+        agent_name: score.agent ? `${score.agent.first_name} ${score.agent.last_name}` : 'Unknown',
+        score_type_name: score.score_type?.name || 'Unknown',
+        score_value: score.score_type?.score_value || 0,
+        assigned_by_name: score.assigned_by_user ? `${score.assigned_by_user.first_name} ${score.assigned_by_user.last_name}` : 'Unknown'
+      };
+      return transformedScore;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to create score');
+      return rejectWithValue(error.message || 'Failed to create score');
     }
   }
 );
@@ -76,10 +106,18 @@ export const updateScore = createAsyncThunk(
   'scores/updateScore',
   async ({ id, ...scoreData }: Partial<Score> & { id: string }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/scores/${id}`, scoreData);
-      return response.data.score;
+      const score = await updateScoreApi(id, scoreData);
+      // Transform the returned score to include the expected properties
+      const transformedScore = {
+        ...score,
+        agent_name: score.agent ? `${score.agent.first_name} ${score.agent.last_name}` : 'Unknown',
+        score_type_name: score.score_type?.name || 'Unknown',
+        score_value: score.score_type?.score_value || 0,
+        assigned_by_name: score.assigned_by_user ? `${score.assigned_by_user.first_name} ${score.assigned_by_user.last_name}` : 'Unknown'
+      };
+      return transformedScore;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update score');
+      return rejectWithValue(error.message || 'Failed to update score');
     }
   }
 );
@@ -88,10 +126,10 @@ export const deleteScore = createAsyncThunk(
   'scores/deleteScore',
   async (id: string, { rejectWithValue }) => {
     try {
-      await api.delete(`/scores/${id}`);
+      await deleteScoreApi(id);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete score');
+      return rejectWithValue(error.message || 'Failed to delete score');
     }
   }
 );
@@ -124,6 +162,7 @@ const scoresSlice = createSlice({
       .addCase(createScore.fulfilled, (state, action) => {
         state.scores.unshift(action.payload);
         state.pagination.total += 1;
+        state.pagination.totalPages = Math.ceil(state.pagination.total / state.pagination.limit);
       })
       // Update score
       .addCase(updateScore.fulfilled, (state, action) => {
@@ -136,6 +175,7 @@ const scoresSlice = createSlice({
       .addCase(deleteScore.fulfilled, (state, action) => {
         state.scores = state.scores.filter(score => score.id !== action.payload);
         state.pagination.total -= 1;
+        state.pagination.totalPages = Math.ceil(state.pagination.total / state.pagination.limit);
       });
   },
 });

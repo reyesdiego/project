@@ -11,8 +11,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   Legend
 } from 'recharts';
 import { Users, Trophy, ClipboardList, UserCheck, TrendingUp, Calendar } from 'lucide-react';
@@ -26,7 +24,7 @@ import {
 
 const DashboardPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { stats, monthlyScores, scoreTypesDistribution, agentComparison, isLoading } = useSelector(
+  const { stats, monthlyScores, scoreTypesDistribution, agentComparison } = useSelector(
       (state: RootState) => state.dashboard
   );
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -55,6 +53,8 @@ const DashboardPage: React.FC = () => {
 
     return monthData;
   });
+
+  console.log({monthlyChartData, JSON: monthlyScores})
   // Get unique agents for the chart
   const uniqueAgents = [...new Set(monthlyScores.map(score => score.agent_name))].filter(Boolean);
 
