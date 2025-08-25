@@ -4,11 +4,15 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
+# Use pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+
 # Copy package files
 COPY package*.json pnpm-lock.yaml ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci
+RUN pnpm ci
 
 # Copy source code and .env file
 COPY . .
@@ -18,7 +22,7 @@ ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 
 # Build the application with production mode
-RUN npm run build
+RUN pnpm run build
 
 # Production stage
 FROM nginx:alpine AS production
