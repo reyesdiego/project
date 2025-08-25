@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /app
-
+ENV CI=true
 # Use pnpm
 RUN corepack enable && corepack prepare pnpm@9 --activate
 
@@ -12,7 +12,9 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 COPY package*.json pnpm-lock.yaml ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN pnpm ci
+# Install deps, fail if lockfile doesn't match
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy source code and .env file
 COPY . .

@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "migration:create": "supabase migration new create_users_table"
   },
+   "packageManager": "pnpm@9.12.3",
   "dependencies": {
     "@headlessui/react": "^2.2.6",
     "@reduxjs/toolkit": "^2.8.2",
