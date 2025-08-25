@@ -221,10 +221,10 @@ const AgentPointsDashboardPage: React.FC = () => {
    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
      <div className="mb-6">
        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-         Puntos Totales por Agente
+         Totales por Agente
        </h2>
        <p className="text-gray-600 dark:text-gray-400">
-         Distribución completa de puntos acumulados por cada agente
+         Distribución completa de acumulados por cada agente
        </p>
      </div>
 
@@ -395,7 +395,7 @@ const AgentPointsDashboardPage: React.FC = () => {
         {!isFullscreen && <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Dashboard de Puntos por Agente
+              Dashboard Agentes
             </h1>
             {isFullscreen && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
@@ -404,7 +404,7 @@ const AgentPointsDashboardPage: React.FC = () => {
             )}
           </div>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Vista completa del historial de puntos de todos los agentes
+            Vista completa del historial de agentes
           </p>
         </div>}
         {!isFullscreen && <div className="mt-4 lg:mt-0">

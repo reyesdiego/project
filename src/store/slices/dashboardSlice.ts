@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getDashboardData } from '../../services/api';
+import { getDashboardData, getMonthlyScores } from '../../services/api';
 
 interface DashboardStats {
   agents: number;
@@ -75,17 +75,9 @@ export const fetchDashboardStats = createAsyncThunk(
 
 export const fetchMonthlyScores = createAsyncThunk(
   'dashboard/fetchMonthlyScores',
-  async (year: number, { rejectWithValue }) => {
+  async ({ year, month }: { year: number; month?: number }, { rejectWithValue }) => {
     try {
-      // For now, we'll use the same getDashboardData function
-      // In a real implementation, you might want to create specific functions for these
-      const data = await getDashboardData();
-      // Transform the data to match MonthlyScore interface
-      const monthlyScores: MonthlyScore[] = data.recentScores.map((score: any) => ({
-        agent_name: score.agent?.first_name + ' ' + score.agent?.last_name || 'Unknown',
-        month: new Date(score.score_date).getMonth() + 1,
-        total_score: score.score_type?.score_value || 0
-      }));
+      const monthlyScores = await getMonthlyScores(year, month);
       return monthlyScores;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch monthly scores');

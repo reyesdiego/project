@@ -28,13 +28,14 @@ const DashboardPage: React.FC = () => {
       (state: RootState) => state.dashboard
   );
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchDashboardStats());
-    dispatch(fetchMonthlyScores(selectedYear));
+    dispatch(fetchMonthlyScores({ year: selectedYear, month: selectedMonth || undefined }));
     dispatch(fetchScoreTypesDistribution(selectedYear));
     dispatch(fetchAgentComparison(selectedYear));
-  }, [dispatch, selectedYear]);
+  }, [dispatch, selectedYear, selectedMonth]);
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
 
@@ -44,17 +45,21 @@ const DashboardPage: React.FC = () => {
   ];
 
   // Process monthly scores for chart
-  const monthlyChartData = monthNames.map((month, index) => {
-    const monthData: any = { month };
-    const monthScores = monthlyScores.filter(score => score.month == index + 1);
-    monthScores.forEach(score => {
-      monthData[score.agent_name] = Number(score.total_score) || 0;
-    });
+  const monthlyChartData = selectedMonth === null 
+    ? monthNames.map((month, index) => {
+        const monthData: any = { month };
+        const monthScores = monthlyScores.filter(score => score.month === index + 1);
+        monthScores.forEach(score => {
+          monthData[score.agent_name] = Number(score.total_score) || 0;
+        });
+        return monthData;
+      })
+    : monthlyScores.map(score => ({
+        agent: score.agent_name,
+        total_score: Number(score.total_score) || 0
+      }));
 
-    return monthData;
-  });
-
-  console.log({monthlyChartData, JSON: monthlyScores})
+  console.log("DashboardPage", {monthlyChartData, JSON: monthlyScores})
   // Get unique agents for the chart
   const uniqueAgents = [...new Set(monthlyScores.map(score => score.agent_name))].filter(Boolean);
 
@@ -110,6 +115,16 @@ const DashboardPage: React.FC = () => {
                   <option key={year} value={year}>{year}</option>
               ))}
             </select>
+            <select
+                value={selectedMonth || ''}
+                onChange={(e) => setSelectedMonth(e.target.value ? Number(e.target.value) : null)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Todos los meses</option>
+              {monthNames.map((month, index) => (
+                  <option key={index + 1} value={index + 1}>{month}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -143,25 +158,36 @@ const DashboardPage: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Puntajes Mensuales por Agente
+                {selectedMonth === null 
+                  ? `Mensuales por Agente - ${selectedYear}` 
+                  : `${monthNames[selectedMonth - 1]} ${selectedYear} - Por Agente`
+                }
               </h3>
               <TrendingUp className="w-5 h-5 text-blue-500" />
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={monthlyChartData}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey={selectedMonth === null ? "month" : "agent"} />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                {uniqueAgents.slice(0, 4).map((agent, index) => (
+                {selectedMonth === null ? (
+                  uniqueAgents.slice(0, 4).map((agent, index) => (
                     <Bar
-                        key={agent}
-                        dataKey={agent}
-                        fill={COLORS[index % COLORS.length]}
-                        radius={[4, 4, 0, 0]}
+                      key={agent}
+                      dataKey={agent}
+                      fill={COLORS[index % COLORS.length]}
+                      radius={[4, 4, 0, 0]}
                     />
-                ))}
+                  ))
+                ) : (
+                  <Bar
+                    dataKey="total_score"
+                    fill={COLORS[0]}
+                    radius={[4, 4, 0, 0]}
+                  />
+                )}
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -181,7 +207,7 @@ const DashboardPage: React.FC = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="count"

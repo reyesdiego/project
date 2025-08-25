@@ -295,6 +295,67 @@ export const getDashboardData = async () => {
   };
 };
 
+// Get monthly scores aggregated by agent and month
+export const getMonthlyScores = async (year: number, month?: number) => {
+  let query = supabase
+    .from('scores')
+    .select(`
+      *,
+      agent:agents(first_name, last_name),
+      score_type:score_types(name, score_value)
+    `)
+    .gte('score_date', `${year}-01-01`)
+    .lt('score_date', `${year + 1}-01-01`);
+
+  if (month !== undefined && month !== null) {
+    const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
+    const endDate = month === 12 
+      ? `${year + 1}-01-01` 
+      : `${year}-${(month + 1).toString().padStart(2, '0')}-01`;
+    
+    query = query
+      .gte('score_date', startDate)
+      .lt('score_date', endDate);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw error;
+
+  // Aggregate scores by agent and month
+  const aggregatedData: { [key: string]: { [key: string]: number } } = {};
+  
+  data.forEach((score: any) => {
+    const agentName = `${score.agent?.first_name} ${score.agent?.last_name}`.trim() || 'Unknown';
+    const scoreMonth = new Date(score.score_date).getMonth() + 1;
+    const scoreValue = score.score_type?.score_value || 0;
+    
+    if (!aggregatedData[agentName]) {
+      aggregatedData[agentName] = {};
+    }
+    
+    if (!aggregatedData[agentName][scoreMonth]) {
+      aggregatedData[agentName][scoreMonth] = 0;
+    }
+    
+    aggregatedData[agentName][scoreMonth] += scoreValue;
+  });
+
+  // Transform to the expected format
+  const result = [];
+  for (const [agentName, months] of Object.entries(aggregatedData)) {
+    for (const [month, totalScore] of Object.entries(months)) {
+      result.push({
+        agent_name: agentName,
+        month: parseInt(month),
+        total_score: totalScore
+      });
+    }
+  }
+
+  return result;
+};
+
 // Default export for backward compatibility
 const api = {
   login,
@@ -318,7 +379,8 @@ const api = {
   createScore,
   updateScore,
   deleteScore,
-  getDashboardData
+  getDashboardData,
+  getMonthlyScores
 };
 
 export default api;
