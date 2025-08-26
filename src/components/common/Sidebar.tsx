@@ -22,17 +22,17 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: Home, allowedRoles: ['admin', 'evaluador', 'visualizador'] },
-    { name: 'Puntos por Agente', href: '/agent-points', icon: TrendingUp, allowedRoles: ['admin', 'evaluador', 'visualizador'] },
-    { name: 'Agentes', href: '/agents', icon: UserCheck, allowedRoles: ['admin', 'evaluador'] },
-    { name: 'Tipos de Puntaje', href: '/score-types', icon: Trophy, allowedRoles: ['admin'] },
-    { name: 'Asignar Puntajes', href: '/assign-scores', icon: ClipboardList, allowedRoles: ['admin', 'evaluador'] },
-    { name: 'Listado de Puntajes', href: '/scores', icon: BarChart3, allowedRoles: ['admin', 'evaluador', 'visualizador'] },
-    { name: 'Usuarios', href: '/users', icon: Users, allowedRoles: ['admin'] },
+    { name: 'Dashboard', href: '/', icon: Home, adminOnly: false },
+    { name: 'Puntos por Agente', href: '/agent-points', icon: TrendingUp, adminOnly: false },
+    { name: 'Agentes', href: '/agents', icon: UserCheck, adminOnly: false },
+    { name: 'Tipos de Puntaje', href: '/score-types', icon: Trophy, adminOnly: true },
+    { name: 'Asignar Puntajes', href: '/assign-scores', icon: ClipboardList, adminOnly: false },
+    { name: 'Listado de Puntajes', href: '/scores', icon: BarChart3, adminOnly: false },
+    { name: 'Usuarios', href: '/users', icon: Users, adminOnly: true },
   ];
 
   const filteredNavigation = navigation.filter(item => 
-    user && item.allowedRoles.includes(user.role)
+    user && (!item.adminOnly || user.is_admin)
   );
 
   const toggleMobileMenu = () => {

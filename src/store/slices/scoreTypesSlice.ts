@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getScoreTypes, createScoreType as createScoreTypeApi, updateScoreType as updateScoreTypeApi, deleteScoreType as deleteScoreTypeApi } from '../../services/api';
 
 interface ScoreType {
-  id: string;
+  id: number;
   name: string;
   description?: string;
   score_value: number;
@@ -49,7 +49,7 @@ export const createScoreType = createAsyncThunk(
 
 export const updateScoreType = createAsyncThunk(
   'scoreTypes/updateScoreType',
-  async ({ id, ...scoreTypeData }: Partial<ScoreType> & { id: string }, { rejectWithValue }) => {
+  async ({ id, ...scoreTypeData }: Partial<ScoreType> & { id: number }, { rejectWithValue }) => {
     try {
       const scoreType = await updateScoreTypeApi(id, scoreTypeData);
       return scoreType;
@@ -61,7 +61,7 @@ export const updateScoreType = createAsyncThunk(
 
 export const deleteScoreType = createAsyncThunk(
   'scoreTypes/deleteScoreType',
-  async (id: string, { rejectWithValue }) => {
+  async (id: number, { rejectWithValue }) => {
     try {
       await deleteScoreTypeApi(id);
       return id;

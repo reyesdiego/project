@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getScores, createScore as createScoreApi, updateScore as updateScoreApi, deleteScore as deleteScoreApi } from '../../services/api';
-import { Score } from '../../lib/supabase';
+import { getScores, createScore as createScoreApi, updateScore as updateScoreApi, deleteScore as deleteScoreApi, Score } from '../../services/api';
 
 interface ScoreWithNames extends Score {
   agent_name?: string;
@@ -35,7 +34,7 @@ const initialState: ScoresState = {
 
 export const fetchScores = createAsyncThunk(
   'scores/fetchScores',
-  async (filters: { agent_id?: string; month?: string; year?: string; page?: number } = {}, { rejectWithValue }) => {
+  async (filters: { agent_id?: number; month?: string; year?: string; page?: number } = {}, { rejectWithValue }) => {
     try {
       const scores = await getScores();
       // Transform the data to include the expected properties
@@ -49,7 +48,7 @@ export const fetchScores = createAsyncThunk(
 
       // Apply filters
       if (filters.agent_id) {
-        transformedScores = transformedScores.filter(score => score.agent_id === parseInt(filters.agent_id!));
+        transformedScores = transformedScores.filter(score => score.agent_id === filters.agent_id);
       }
       if (filters.month) {
         transformedScores = transformedScores.filter(score => new Date(score.score_date).getMonth() + 1 === parseInt(filters.month!));
@@ -104,7 +103,7 @@ export const createScore = createAsyncThunk(
 
 export const updateScore = createAsyncThunk(
   'scores/updateScore',
-  async ({ id, ...scoreData }: Partial<Score> & { id: string }, { rejectWithValue }) => {
+  async ({ id, ...scoreData }: Partial<Score> & { id: number }, { rejectWithValue }) => {
     try {
       const score = await updateScoreApi(id, scoreData);
       // Transform the returned score to include the expected properties
@@ -124,7 +123,7 @@ export const updateScore = createAsyncThunk(
 
 export const deleteScore = createAsyncThunk(
   'scores/deleteScore',
-  async (id: string, { rejectWithValue }) => {
+  async (id: number, { rejectWithValue }) => {
     try {
       await deleteScoreApi(id);
       return id;

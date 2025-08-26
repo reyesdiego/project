@@ -131,9 +131,6 @@ const AgentPointsDashboardPage: React.FC = () => {
        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
          🏆 Ranking de Agentes
        </h2>
-       {/* <p className="text-gray-600 dark:text-gray-400">
-         Clasificación completa de agentes ordenados por puntos totales
-       </p> */}
      </div>
 
      <div className="space-y-2 w-full overflow-hidden">
@@ -162,8 +159,8 @@ const AgentPointsDashboardPage: React.FC = () => {
                  backgroundColor,
                  color: textColor,
                  width: `${calculatedWidth}%`,
-                 minHeight: '60px',
-                 maxHeight: '76px'
+                 minHeight: '40px',
+                 maxHeight: '60px'
                }}
              >
              {/* Position Badge with Trophy for top 3 */}
@@ -192,20 +189,23 @@ const AgentPointsDashboardPage: React.FC = () => {
                    <h3 className="text-lg font-semibold truncate">
                      <b>{agent.agent_name}</b>
                    </h3>
-                   <p className="text-xs opacity-90 truncate">
+                   {/* <p className="text-xs opacity-90 truncate">
                      {agent.total_scores} evaluaciones
-                   </p>
+                   </p> */}
                  </div>
                  <div className="text-right flex-shrink-0 ml-4">
                    <div className="text-xl font-bold">
-                     {agent.total_points.toLocaleString()}
+                     <span className="text-xs opacity-90"><b>{percentage > 0 
+                       ? percentage.toFixed(1)
+                       : '0.0'
+                     } %</b></span>&nbsp;&nbsp;<span>{agent.total_points.toLocaleString()}</span>
                    </div>
-                   <div className="text-xs opacity-90">
+                   {/* <div className="text-xs opacity-90">
                    <b>{percentage > 0 
                        ? percentage.toFixed(1)
                        : '0.0'
                      } %</b>
-                   </div>
+                   </div> */}
                  </div>
                </div>
 
