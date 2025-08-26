@@ -9,13 +9,13 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 interface User {
-  id: string;
+  id: number;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
   phone?: string;
-  role: 'admin' | 'evaluador' | 'visualizador';
+  is_admin: boolean;
   is_active: boolean;
   created_at: string;
 }
@@ -36,7 +36,7 @@ const UsersPage: React.FC = () => {
     first_name: string;
     last_name: string;
     phone: string;
-    role: 'admin' | 'evaluador' | 'visualizador';
+    is_admin: boolean;
     is_active: boolean;
   }>({
     username: '',
@@ -45,7 +45,7 @@ const UsersPage: React.FC = () => {
     first_name: '',
     last_name: '',
     phone: '',
-    role: 'visualizador',
+    is_admin: false,
     is_active: true,
   });
 
@@ -57,7 +57,7 @@ const UsersPage: React.FC = () => {
     `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
+    (user.is_admin ? 'admin' : 'usuario').includes(searchTerm.toLowerCase())
   );
 
   const handleOpenModal = (user?: User) => {
@@ -70,7 +70,7 @@ const UsersPage: React.FC = () => {
         first_name: user.first_name,
         last_name: user.last_name,
         phone: user.phone || '',
-        role: user.role,
+        is_admin: user.is_admin,
         is_active: user.is_active,
       });
     } else {
@@ -82,7 +82,7 @@ const UsersPage: React.FC = () => {
         first_name: '',
         last_name: '',
         phone: '',
-        role: 'visualizador',
+        is_admin: false,
         is_active: true,
       });
     }
@@ -132,33 +132,23 @@ const UsersPage: React.FC = () => {
     }
   };
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return <Shield className="w-4 h-4 text-red-600" />;
-      case 'evaluador':
-        return <Edit className="w-4 h-4 text-blue-600" />;
-      case 'visualizador':
-        return <Eye className="w-4 h-4 text-green-600" />;
-      default:
-        return <Users className="w-4 h-4 text-gray-600" />;
+  const getRoleIcon = (isAdmin: boolean) => {
+    if (isAdmin) {
+      return <Shield className="w-4 h-4 text-red-600" />;
+    } else {
+      return <Users className="w-4 h-4 text-gray-600" />;
     }
   };
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'evaluador':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'visualizador':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+  const getRoleColor = (isAdmin: boolean) => {
+    if (isAdmin) {
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+    } else {
+      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
     }
   };
 
-  if (currentUser?.role !== 'admin') {
+  if (!currentUser?.is_admin) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
@@ -211,15 +201,11 @@ const UsersPage: React.FC = () => {
         <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center space-x-2">
             <Shield className="w-4 h-4 text-red-600" />
-            <span>Admin: {users.filter(u => u.role === 'admin').length}</span>
+            <span>Admin: {users.filter(u => u.is_admin).length}</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Edit className="w-4 h-4 text-blue-600" />
-            <span>Evaluadores: {users.filter(u => u.role === 'evaluador').length}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Eye className="w-4 h-4 text-green-600" />
-            <span>Visualizadores: {users.filter(u => u.role === 'visualizador').length}</span>
+            <Users className="w-4 h-4 text-blue-600" />
+            <span>Usuarios: {users.filter(u => !u.is_admin).length}</span>
           </div>
         </div>
       </div>
@@ -281,9 +267,9 @@ const UsersPage: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
-                      {getRoleIcon(user.role)}
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                      {getRoleIcon(user.is_admin)}
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.is_admin)}`}>
+                        {user.is_admin ? 'Admin' : 'Usuario'}
                       </span>
                     </div>
                   </td>
@@ -427,15 +413,14 @@ const UsersPage: React.FC = () => {
                 Rol
               </label>
               <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
+                name="is_admin"
+                value={formData.is_admin.toString()}
+                onChange={(e) => setFormData(prev => ({ ...prev, is_admin: e.target.value === 'true' }))}
                 required
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               >
-                <option value="visualizador">Visualizador</option>
-                <option value="evaluador">Evaluador</option>
-                <option value="admin">Administrador</option>
+                <option value="false">Usuario</option>
+                <option value="true">Administrador</option>
               </select>
             </div>
           </div>
@@ -465,12 +450,8 @@ const UsersPage: React.FC = () => {
                 <span><strong>Administrador:</strong> Acceso completo al sistema</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Edit className="w-3 h-3 text-blue-600" />
-                <span><strong>Evaluador:</strong> Puede gestionar agentes y asignar puntajes</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Eye className="w-3 h-3 text-green-600" />
-                <span><strong>Visualizador:</strong> Solo puede ver dashboards y reportes</span>
+                <Users className="w-3 h-3 text-blue-600" />
+                <span><strong>Usuario:</strong> Acceso básico al sistema</span>
               </div>
             </div>
           </div>

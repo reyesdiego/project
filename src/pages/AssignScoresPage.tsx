@@ -23,6 +23,7 @@ const AssignScoresPage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     dispatch(fetchAgents());
@@ -41,30 +42,38 @@ const AssignScoresPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSuccessMessage('');
+    setErrorMessage('');
 
     try {
-      await dispatch(createScore({
+      const result = await dispatch(createScore({
         ...formData,
         agent_id: parseInt(formData.agent_id),
         score_type_id: parseInt(formData.score_type_id),
-        assigned_by: user?.id ? parseInt(user.id) : undefined
+        assigned_by: user?.id ? user.id : undefined
       }));
-      setSuccessMessage('Puntaje asignado exitosamente');
-      setFormData({
-        agent_id: '',
-        score_type_id: '',
-        score_date: new Date().toISOString().split('T')[0],
-        comment: '',
-      });
+      
+      // Check if the action was rejected
+      if (createScore.rejected.match(result)) {
+        setErrorMessage(result.payload as string || 'Error al asignar el puntaje');
+      } else {
+        setSuccessMessage('Puntaje asignado exitosamente');
+        setFormData({
+          agent_id: '',
+          score_type_id: '',
+          score_date: new Date().toISOString().split('T')[0],
+          comment: '',
+        });
+      }
     } catch (error) {
       console.error('Error assigning score:', error);
+      setErrorMessage('Error al asignar el puntaje');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const selectedScoreType = scoreTypes.find(st => st.id === formData.score_type_id);
-  const selectedAgent = agents.find(a => a.id === formData.agent_id);
+  const selectedScoreType = scoreTypes.find(st => st.id === parseInt(formData.score_type_id));
+  const selectedAgent = agents.find(a => a.id === parseInt(formData.agent_id));
 
   if (user?.role !== 'admin' && user?.role !== 'evaluador') {
     return (
@@ -122,6 +131,13 @@ const AssignScoresPage: React.FC = () => {
         </div>
       )}
 
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-600 dark:text-red-400 text-sm font-medium">{errorMessage}</p>
+        </div>
+      )}
+
       {/* Assignment Form */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -151,7 +167,7 @@ const AssignScoresPage: React.FC = () => {
                 <option value="">Selecciona un agente</option>
                 {agents.filter(agent => agent.is_active).map((agent) => (
                   <option key={agent.id} value={agent.id}>
-                    {agent.first_name} {agent.last_name} - {agent.area}
+                    {agent.first_name} {agent.last_name}
                   </option>
                 ))}
               </select>
@@ -226,7 +242,7 @@ const AssignScoresPage: React.FC = () => {
                     {selectedAgent.first_name} {selectedAgent.last_name}
                   </p>
                   <p className="text-gray-500 dark:text-gray-400 text-xs">
-                    {selectedAgent.area} - {selectedAgent.position}
+                    {selectedAgent.email}
                   </p>
                 </div>
                 <div>

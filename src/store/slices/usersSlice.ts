@@ -2,13 +2,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getUsers, createUser as createUserApi, updateUser as updateUserApi, deleteUser as deleteUserApi } from '../../services/api';
 
 interface User {
-  id: string;
+  id: number;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
   phone?: string;
-  role: 'admin' | 'evaluador' | 'visualizador';
+  is_admin: boolean;
   is_active: boolean;
   created_at: string;
 }
@@ -51,7 +51,7 @@ export const createUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'users/updateUser',
-  async ({ id, ...userData }: Partial<User> & { id: string }, { rejectWithValue }) => {
+  async ({ id, ...userData }: Partial<User> & { id: number }, { rejectWithValue }) => {
     try {
       const user = await updateUserApi(id, userData);
       return user;
@@ -63,7 +63,7 @@ export const updateUser = createAsyncThunk(
 
 export const deleteUser = createAsyncThunk(
   'users/deleteUser',
-  async (id: string, { rejectWithValue }) => {
+  async (id: number, { rejectWithValue }) => {
     try {
       await deleteUserApi(id);
       return id;

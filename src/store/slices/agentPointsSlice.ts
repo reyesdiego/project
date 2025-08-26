@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { supabase } from '../../lib/supabase';
+import { getAgents, getScores } from '../../services/api';
 
 interface AgentPoints {
   agent_id: number;
@@ -26,32 +26,19 @@ export const fetchAgentPointsHistory = createAsyncThunk(
   'agentPoints/fetchHistory',
   async (_, { rejectWithValue }) => {
     try {
-      // Fetch all agents with their total points
-      const { data: agents, error: agentsError } = await supabase
-        .from('agents')
-        .select('id, first_name, last_name, is_active')
-        .eq('is_active', true)
-        .order('first_name');
+      // Fetch all agents and scores
+      const [agents, scores] = await Promise.all([
+        getAgents(),
+        getScores()
+      ]);
 
-      if (agentsError) throw agentsError;
-
-      // Fetch all scores for each agent
-      const { data: scores, error: scoresError } = await supabase
-        .from('scores')
-        .select(`
-          agent_id,
-          score_type_id,
-          score_date,
-          score_types!inner(score_value)
-        `)
-        .order('score_date', { ascending: false });
-
-      if (scoresError) throw scoresError;
+      // Filter active agents
+      const activeAgents = agents.filter(agent => agent.is_active);
 
       // Calculate points for each agent
-      const agentPointsData: AgentPoints[] = agents.map(agent => {
+      const agentPointsData: AgentPoints[] = activeAgents.map(agent => {
         const agentScores = scores.filter(score => score.agent_id === agent.id);
-        const totalPoints = agentScores.reduce((sum, score) => sum + (score.score_types?.score_value || 0), 0);
+        const totalPoints = agentScores.reduce((sum, score) => sum + (score.score_type?.score_value || 0), 0);
         const totalScores = agentScores.length;
         const avgScore = totalScores > 0 ? Math.round(totalPoints / totalScores) : 0;
         const lastScoreDate = agentScores.length > 0 ? agentScores[0].score_date : '';

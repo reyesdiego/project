@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getDashboardData, getMonthlyScores } from '../../services/api';
+import { getDashboardData, getMonthlyScores, getScoreTypesDistribution, getAgentComparison } from '../../services/api';
 
 interface DashboardStats {
   agents: number;
@@ -89,24 +89,7 @@ export const fetchScoreTypesDistribution = createAsyncThunk(
   'dashboard/fetchScoreTypesDistribution',
   async (year: number, { rejectWithValue }) => {
     try {
-      // For now, we'll use the same getDashboardData function
-      const data = await getDashboardData();
-      // Transform the data to match ScoreTypeDistribution interface
-      const distribution: ScoreTypeDistribution[] = data.recentScores.reduce((acc: any[], score: any) => {
-        const scoreTypeName = score.score_type?.name || 'Unknown';
-        const existing = acc.find(item => item.name === scoreTypeName);
-        if (existing) {
-          existing.count += 1;
-          existing.total_value += score.score_type?.score_value || 0;
-        } else {
-          acc.push({
-            name: scoreTypeName,
-            count: 1,
-            total_value: score.score_type?.score_value || 0
-          });
-        }
-        return acc;
-      }, []);
+      const distribution = await getScoreTypesDistribution(year);
       return distribution;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch score types distribution');
@@ -118,30 +101,7 @@ export const fetchAgentComparison = createAsyncThunk(
   'dashboard/fetchAgentComparison',
   async (year: number, { rejectWithValue }) => {
     try {
-      // For now, we'll use the same getDashboardData function
-      const data = await getDashboardData();
-      // Transform the data to match AgentComparison interface
-      const comparison: AgentComparison[] = data.recentScores.reduce((acc: any[], score: any) => {
-        const agentName = score.agent?.first_name + ' ' + score.agent?.last_name || 'Unknown';
-        const existing = acc.find(item => item.agent_name === agentName);
-        if (existing) {
-          existing.total_scores += 1;
-          existing.total_points += score.score_type?.score_value || 0;
-          existing.avg_score = existing.total_points / existing.total_scores;
-          if (new Date(score.score_date) > new Date(existing.last_score_date)) {
-            existing.last_score_date = score.score_date;
-          }
-        } else {
-          acc.push({
-            agent_name: agentName,
-            total_scores: 1,
-            total_points: score.score_type?.score_value || 0,
-            avg_score: score.score_type?.score_value || 0,
-            last_score_date: score.score_date
-          });
-        }
-        return acc;
-      }, []);
+      const comparison = await getAgentComparison(year);
       return comparison;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch agent comparison');
@@ -151,13 +111,13 @@ export const fetchAgentComparison = createAsyncThunk(
 
 export const fetchAgentEvolution = createAsyncThunk(
   'dashboard/fetchAgentEvolution',
-  async ({ agentId, year }: { agentId: string; year: number }, { rejectWithValue }) => {
+  async ({ agentId, year }: { agentId: number; year: number }, { rejectWithValue }) => {
     try {
       // For now, we'll use the same getDashboardData function
       const data = await getDashboardData();
       // Transform the data to match AgentEvolution interface
       const evolution: AgentEvolution[] = data.recentScores
-        .filter((score: any) => score.agent_id === parseInt(agentId))
+        .filter((score: any) => score.agent_id === agentId)
         .reduce((acc: any[], score: any) => {
           const month = new Date(score.score_date).getMonth() + 1;
           const existing = acc.find(item => item.month === month);
@@ -190,9 +150,10 @@ const dashboardSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch stats
+      // Fetch dashboard stats
       .addCase(fetchDashboardStats.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(fetchDashboardStats.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -203,20 +164,56 @@ const dashboardSlice = createSlice({
         state.error = action.payload as string;
       })
       // Fetch monthly scores
+      .addCase(fetchMonthlyScores.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchMonthlyScores.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.monthlyScores = action.payload;
       })
+      .addCase(fetchMonthlyScores.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
       // Fetch score types distribution
+      .addCase(fetchScoreTypesDistribution.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchScoreTypesDistribution.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.scoreTypesDistribution = action.payload;
       })
+      .addCase(fetchScoreTypesDistribution.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
       // Fetch agent comparison
+      .addCase(fetchAgentComparison.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchAgentComparison.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.agentComparison = action.payload;
       })
+      .addCase(fetchAgentComparison.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
       // Fetch agent evolution
+      .addCase(fetchAgentEvolution.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchAgentEvolution.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.agentEvolution = action.payload;
+      })
+      .addCase(fetchAgentEvolution.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       });
   },
 });

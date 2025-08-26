@@ -8,14 +8,11 @@ export default defineConfig(({ mode }) => {
   
   // Debug: Log environment variables
   console.log('Vite config - Environment variables:');
-  console.log('VITE_SUPABASE_URL:', env.VITE_SUPABASE_URL ? 'SET' : 'MISSING');
-  console.log('VITE_SUPABASE_ANON_KEY:', env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
-  console.log('Process env VITE_SUPABASE_URL:', process.env.VITE_SUPABASE_URL ? 'SET' : 'MISSING');
-  console.log('Process env VITE_SUPABASE_ANON_KEY:', process.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
+  console.log('VITE_API_URL:', env.VITE_API_URL ? 'SET' : 'MISSING');
+  console.log('Process env VITE_API_URL:', process.env.VITE_API_URL ? 'SET' : 'MISSING');
   
   // Get environment variables from multiple sources
-  const supabaseUrl = env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const apiUrl = env.VITE_API_URL || process.env.VITE_API_URL || 'http://localhost:3001/api';
   
   return {
     plugins: [react()],
@@ -24,8 +21,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       // Expose env variables to the client
-      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(supabaseUrl),
-      'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(supabaseKey),
+      'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
     },
   };
 });

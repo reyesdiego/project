@@ -2,13 +2,13 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { login, logout, getCurrentUser, updateUserPhone as updateUserPhoneApi } from '../../services/api';
 
 interface User {
-  id: string;
+  id: number;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
+  role: string;
   phone?: string;
-  role: 'admin' | 'evaluador' | 'visualizador';
   is_active: boolean;
 }
 

@@ -6,16 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:debug": "echo 'Environment check:' && echo 'VITE_SUPABASE_URL:' $VITE_SUPABASE_URL && echo 'VITE_SUPABASE_ANON_KEY:' $VITE_SUPABASE_ANON_KEY && vite build",
+    "build:debug": "echo 'Environment check:' && echo 'VITE_API_URL:' $VITE_API_URL && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "migration:create": "supabase migration new create_users_table"
+    "preview": "vite preview"
   },
    "packageManager": "pnpm@9.12.3",
   "dependencies": {
     "@headlessui/react": "^2.2.6",
     "@reduxjs/toolkit": "^2.8.2",
-    "@supabase/supabase-js": "^2.53.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
