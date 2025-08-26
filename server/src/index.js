@@ -47,24 +47,19 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // In production, allow any origin
+    if (process.env.NODE_ENV === 'production') {
+      return callback(null, true);
+    }
+    
+    // In development, allow localhost origins
     const allowedOrigins = [
-      'http://localhost:5173', // Vite dev server
-      'http://localhost:3000', // Alternative dev port
-      'http://localhost:4173', // Vite preview server
-      'http://localhost:5174', // Alternative Vite port
-      'http://127.0.0.1:5173', // Alternative localhost
-      'http://127.0.0.1:3000', // Alternative localhost
-      'http://127.0.0.1:4173', // Alternative localhost
-      'http://127.0.0.1:5174', // Alternative localhost
       process.env.CORS_ORIGIN
     ].filter(Boolean);
     
-    // In development, be more permissive
-    if (process.env.NODE_ENV === 'development') {
-      // Allow any localhost origin in development
-      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        return callback(null, true);
-      }
+    // Allow any localhost origin in development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
     }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -99,21 +94,21 @@ app.get('/health', (req, res) => {
 app.options('*', cors(corsOptions));
 
 // Add CORS headers to all responses
-app.use((req, res, next) => {
-  // Set CORS headers for all responses
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+// app.use((req, res, next) => {
+//   // Set CORS headers for all responses
+//   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+//   res.header('Access-Control-Allow-Credentials', 'true');
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+//   // Handle preflight requests
+//   if (req.method === 'OPTIONS') {
+//     res.status(200).end();
+//     return;
+//   }
   
-  next();
-});
+//   next();
+// });
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
