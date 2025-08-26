@@ -1,6 +1,6 @@
 # ScoreTeam REST API Server
 
-A Node.js Express REST API server that replaces Supabase queries for the ScoreTeam application, using Slonik for PostgreSQL database operations.
+A Node.js Express REST API server for the ScoreTeam application, using Slonik for PostgreSQL database operations.
 
 ## Features
 

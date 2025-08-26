@@ -53,7 +53,7 @@ The dashboard fetches data from:
 ### Components
 - **AgentPointsDashboardPage**: Main dashboard component
 - **Redux Slice**: `agentPointsSlice` for state management
-- **API Integration**: Direct Supabase queries for optimal performance
+- **API Integration**: RESTful API calls to Express.js backend for optimal performance
 
 ### Key Features
 - **Real-time Data**: Fetches fresh data on each page load
