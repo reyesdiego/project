@@ -20,8 +20,8 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 COPY . .
 
 # Set build-time environment variables
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_API_URL
+ARG VITE_APP_TITLE
 
 # Build the application with production mode
 RUN pnpm run build

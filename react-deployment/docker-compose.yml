@@ -5,6 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_APP_TITLE: ${VITE_APP_TITLE:-ScoreTeam Dashboard}
     container_name: scoreteam-frontend
     ports:
       - "80:80"
