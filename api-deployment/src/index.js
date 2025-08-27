@@ -37,7 +37,18 @@ const limiter = rateLimit({
 });
 
 // Middleware
-app.use(helmet()); // Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", process.env.API_BASE_URL || 'http://localhost:3001'],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      fontSrc: ["'self'", "https:"],
+    },
+  },
+})); // Security headers
 app.use(morgan('combined')); // Logging
 app.use(limiter); // Rate limiting
 
