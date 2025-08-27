@@ -91,7 +91,7 @@ app.get('/health', (req, res) => {
 });
 
 // Handle preflight requests
-app.options('*', cors(corsOptions));
+// app.options('*', cors(corsOptions));
 
 // Add CORS headers to all responses
 // app.use((req, res, next) => {
