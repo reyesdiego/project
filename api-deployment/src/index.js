@@ -41,43 +41,17 @@ app.use(helmet()); // Security headers
 app.use(morgan('combined')); // Logging
 app.use(limiter); // Rate limiting
 
-// CORS configuration
+// CORS configuration - Simplified for production
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // In production, allow any origin
-    if (process.env.NODE_ENV === 'production') {
-      return callback(null, true);
-    }
-    
-    // In development, allow localhost origins
-    const allowedOrigins = [
-      process.env.CORS_ORIGIN
-    ].filter(Boolean);
-    
-    // Allow any localhost origin in development
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      return callback(null, true);
-    }
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins in production
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   exposedHeaders: ['Content-Length', 'X-Requested-With'],
-  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
-  preflightContinue: false
+  optionsSuccessStatus: 200
 };
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -91,24 +65,7 @@ app.get('/health', (req, res) => {
 });
 
 // Handle preflight requests
-// app.options('*', cors(corsOptions));
-
-// Add CORS headers to all responses
-// app.use((req, res, next) => {
-//   // Set CORS headers for all responses
-//   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-//   res.header('Access-Control-Allow-Credentials', 'true');
-//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  
-//   // Handle preflight requests
-//   if (req.method === 'OPTIONS') {
-//     res.status(200).end();
-//     return;
-//   }
-  
-//   next();
-// });
+app.options('*', cors(corsOptions));
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {

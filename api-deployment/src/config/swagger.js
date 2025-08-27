@@ -22,7 +22,7 @@ const options = {
         description: 'Development server'
       },
       {
-        url: 'https://api.scoreteam.com',
+        url: process.env.API_BASE_URL || 'http://localhost:3001',
         description: 'Production server'
       }
     ],
