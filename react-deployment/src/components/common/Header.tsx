@@ -60,7 +60,7 @@ const Header: React.FC = () => {
                   {user?.first_name} {user?.last_name}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                  {user?.is_admin ? 'Admin' : 'Usuario'}
+                  {user?.role === 'admin' ? 'Admin' : 'Usuario'}
                 </p>
               </div>
               <div className="flex space-x-1">

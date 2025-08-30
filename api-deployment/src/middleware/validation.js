@@ -19,8 +19,8 @@ const userSchema = Joi.object({
   email: Joi.string().email().required(),
   first_name: Joi.string().min(2).max(50).required(),
   last_name: Joi.string().min(2).max(50).required(),
-  phone: Joi.string().optional(),
-  role: Joi.string(),
+  phone: Joi.string().allow('', null).optional(),
+  password: Joi.string().min(6).optional(),
   role: Joi.string(),
   is_active: Joi.boolean().default(true)
 });

@@ -70,7 +70,7 @@ const UserSettingsPage: React.FC = () => {
             </h2>
             <p className="text-gray-600 dark:text-gray-400">@{user.username}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
-              {user.is_admin ? 'Admin' : 'Usuario'}
+              {user.role === 'admin' ? 'Admin' : 'Usuario'}
             </p>
           </div>
         </div>

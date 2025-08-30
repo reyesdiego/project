@@ -15,7 +15,7 @@ interface User {
   first_name: string;
   last_name: string;
   phone?: string;
-  is_admin: boolean;
+  role: boolean;
   is_active: boolean;
   created_at: string;
 }
@@ -36,7 +36,7 @@ const UsersPage: React.FC = () => {
     first_name: string;
     last_name: string;
     phone: string;
-    is_admin: boolean;
+    role: string;
     is_active: boolean;
   }>({
     username: '',
@@ -45,7 +45,7 @@ const UsersPage: React.FC = () => {
     first_name: '',
     last_name: '',
     phone: '',
-    is_admin: false,
+    role: '',
     is_active: true,
   });
 
@@ -57,7 +57,7 @@ const UsersPage: React.FC = () => {
     `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (user.is_admin ? 'admin' : 'usuario').includes(searchTerm.toLowerCase())
+    (user.role === 'admin' ? 'admin' : 'usuario').includes(searchTerm.toLowerCase())
   );
 
   const handleOpenModal = (user?: User) => {
@@ -70,7 +70,7 @@ const UsersPage: React.FC = () => {
         first_name: user.first_name,
         last_name: user.last_name,
         phone: user.phone || '',
-        is_admin: user.is_admin,
+        role: user.role,
         is_active: user.is_active,
       });
     } else {
@@ -82,7 +82,7 @@ const UsersPage: React.FC = () => {
         first_name: '',
         last_name: '',
         phone: '',
-        is_admin: false,
+        role: '',
         is_active: true,
       });
     }
@@ -148,7 +148,7 @@ const UsersPage: React.FC = () => {
     }
   };
 
-  if (!currentUser?.is_admin) {
+  if (currentUser?.role !== 'admin') {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
@@ -201,11 +201,11 @@ const UsersPage: React.FC = () => {
         <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center space-x-2">
             <Shield className="w-4 h-4 text-red-600" />
-            <span>Admin: {users.filter(u => u.is_admin).length}</span>
+            <span>Admin: {users.filter(u => u.role === 'admin').length}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Users className="w-4 h-4 text-blue-600" />
-            <span>Usuarios: {users.filter(u => !u.is_admin).length}</span>
+            <span>Usuarios: {users.filter(u => !u.role === 'admin').length}</span>
           </div>
         </div>
       </div>
@@ -267,9 +267,9 @@ const UsersPage: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
-                      {getRoleIcon(user.is_admin)}
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.is_admin)}`}>
-                        {user.is_admin ? 'Admin' : 'Usuario'}
+                      {getRoleIcon(user.role === 'admin')}
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role === 'admin')}`}>
+                        {user.role === 'admin' ? 'Admin' : 'Usuario'}
                       </span>
                     </div>
                   </td>
@@ -414,8 +414,8 @@ const UsersPage: React.FC = () => {
               </label>
               <select
                 name="is_admin"
-                value={formData.is_admin.toString()}
-                onChange={(e) => setFormData(prev => ({ ...prev, is_admin: e.target.value === 'true' }))}
+                value={(formData.role === 'admin').toString()}
+                onChange={(e) => setFormData(prev => ({ ...prev, is_admin: e.target.value === 'admin' }))}
                 required
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               >

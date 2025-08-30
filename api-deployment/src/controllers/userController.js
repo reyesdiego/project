@@ -19,7 +19,7 @@ console.log(users)
 
 const createUser = async (req, res) => {
   try {
-    const { username, email, first_name, last_name, phone, role, is_admin, is_active, password } = req.body;
+    const { username, email, first_name, last_name, phone, role, is_active, password } = req.body;
 
     // Check if username already exists
     const existingResult = await pool.query(`

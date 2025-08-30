@@ -7,7 +7,6 @@ import {
   UserCheck, 
   Trophy, 
   ClipboardList, 
-  Settings, 
   Menu,
   X,
   Home,
@@ -32,7 +31,7 @@ const Sidebar: React.FC = () => {
   ];
 
   const filteredNavigation = navigation.filter(item => 
-    user && (!item.adminOnly || user.is_admin)
+    user && (!item.adminOnly || user.role === 'admin')
   );
 
   const toggleMobileMenu = () => {
