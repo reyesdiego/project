@@ -43,14 +43,7 @@ if grep -q "your_very_secure_production_password_here" env.prod; then
     exit 1
 fi
 
-# Copy migrations if they exist
-if [ -d "../server/src/migrations" ]; then
-    mkdir -p migrations
-    cp -r ../server/src/migrations/* migrations/
-    print_status "Migrations copied successfully"
-else
-    print_warning "No migrations found in ../server/src/migrations"
-fi
+
 
 # Create backups directory
 mkdir -p backups
@@ -98,6 +91,7 @@ if docker-compose -f docker-compose.prod.yml ps | grep -q "Up"; then
     print_status "User: $POSTGRES_USER"
     print_status "Port: $POSTGRES_PORT"
     print_status "Connection: localhost:$POSTGRES_PORT"
+    print_status "To run migrations, use: ./run-migrations-prod.sh"
     
     # Test database connection
     print_status "Testing database connection..."

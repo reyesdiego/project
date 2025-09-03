@@ -25,14 +25,7 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Copy migrations if they exist
-if [ -d "../server/src/migrations" ]; then
-    mkdir -p migrations
-    cp -r ../server/src/migrations/* migrations/
-    print_status "Migrations copied successfully"
-else
-    print_warning "No migrations found in ../server/src/migrations"
-fi
+
 
 # Use development environment
 if [ -f "env.dev" ]; then
@@ -70,6 +63,7 @@ if docker-compose -f docker-compose.dev.yml ps | grep -q "Up"; then
     print_status "User: $POSTGRES_USER"
     print_status "Port: $POSTGRES_PORT"
     print_status "Connection: localhost:$POSTGRES_PORT"
+    print_status "To run migrations, use: ./run-migrations-dev.sh"
 else
     echo "❌ PostgreSQL failed to start. Check logs with:"
     echo "docker-compose -f docker-compose.dev.yml logs postgres"
