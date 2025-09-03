@@ -48,6 +48,12 @@ const createAgent = async (req, res) => {
     res.status(201).json({ agent: newAgent });
   } catch (error) {
     console.error('Create agent error:', error);
+    
+    // Handle unique constraint violation for email
+    if (error.code === '23505' && error.constraint === 'unique_agent_email') {
+      return res.status(409).json({ error: 'El email ya está en uso por otro agente' });
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 };

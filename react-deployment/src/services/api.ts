@@ -19,6 +19,9 @@ export interface Agent {
   id: number;
   first_name: string;
   last_name: string;
+  area: string;
+  position: string;
+  hire_date: string;
   email?: string;
   phone?: string;
   is_active: boolean;
@@ -138,14 +141,18 @@ export const logout = async () => {
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
     const data = await apiRequest('/auth/me');
+    console.log('API Response for getCurrentUser:', data);
+    console.log('User data:', data.user);
+    console.log('User phone:', data.user?.phone);
     return data.user;
-  } catch {
+  } catch (error) {
+    console.error('Error in getCurrentUser:', error);
     return null;
   }
 };
 
 export const updateUserPhone = async (phone: string) => {
-  const data = await apiRequest('/auth/profile', {
+  const data = await apiRequest('/auth/phone', {
     method: 'PUT',
     body: JSON.stringify({ phone }),
   });
@@ -154,6 +161,20 @@ export const updateUserPhone = async (phone: string) => {
   localStorage.setItem('user', JSON.stringify(data.user));
   
   return data.user;
+};
+
+export const updateUserPassword = async (currentPassword: string, newPassword: string) => {
+  try {
+    const data = await apiRequest('/auth/password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    return data;
+  } catch (error) {
+    console.error('Error updating password:', error);
+    throw error;
+  }
 };
 
 // User management (admin only)

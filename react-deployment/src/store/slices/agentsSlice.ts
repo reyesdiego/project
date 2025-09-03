@@ -5,6 +5,9 @@ interface Agent {
   id: number;
   first_name: string;
   last_name: string;
+  area: string;
+  position: string;
+  hire_date: string;
   email?: string;
   phone?: string;
   is_active: boolean;

@@ -1,5 +1,5 @@
 const express = require('express');
-const { login, getCurrentUser, updateUserPhone } = require('../controllers/authController');
+const { login, getCurrentUser, updateUserPhone, updateUserPassword } = require('../controllers/authController');
 const { authenticateToken } = require('../middleware/auth');
 const { validate, loginSchema } = require('../middleware/validation');
 
@@ -114,5 +114,60 @@ router.get('/me', authenticateToken, getCurrentUser);
  *               $ref: '#/components/schemas/Error'
  */
 router.put('/phone', authenticateToken, updateUserPhone);
+
+/**
+ * @swagger
+ * /api/auth/password:
+ *   put:
+ *     summary: Update user password
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 description: Current password for verification
+ *                 example: admin123
+ *               newPassword:
+ *                 type: string
+ *                 description: New password to set
+ *                 minLength: 6
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 message:
+ *                   type: string
+ *                   example: Password updated successfully
+ *       400:
+ *         description: Current password is incorrect
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.put('/password', authenticateToken, updateUserPassword);
 
 module.exports = router;

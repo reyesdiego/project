@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { login, logout, getCurrentUser, updateUserPhone as updateUserPhoneApi } from '../../services/api';
+import { login, logout, getCurrentUser, updateUserPhone as updateUserPhoneApi, updateUserPassword as updateUserPasswordApi } from '../../services/api';
 
 interface User {
   id: number;
@@ -76,6 +76,18 @@ export const updateUserPhone = createAsyncThunk(
   }
 );
 
+export const updateUserPassword = createAsyncThunk(
+  'auth/updateUserPassword',
+  async ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }, { rejectWithValue }) => {
+    try {
+      const data = await updateUserPasswordApi(currentPassword, newPassword);
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update password');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -125,9 +137,26 @@ const authSlice = createSlice({
       })
       // Update phone
       .addCase(updateUserPhone.fulfilled, (state, action) => {
-        if (state.user) {
-          state.user.phone = action.payload.phone;
+        if (state.user && action.payload.user) {
+          state.user.phone = action.payload.user.phone;
         }
+      })
+      // Update password
+      .addCase(updateUserPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        // Update user state with the returned user data
+        if (action.payload.user && state.user) {
+          state.user = { ...state.user, ...action.payload.user };
+        }
+      })
+      .addCase(updateUserPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

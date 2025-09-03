@@ -124,7 +124,7 @@ const ScoreTypesPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tipos de Puntaje</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Puntajes</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Configura los diferentes tipos de evaluación
           </p>
@@ -132,7 +132,7 @@ const ScoreTypesPage: React.FC = () => {
         <div className="mt-4 lg:mt-0">
           <Button onClick={() => handleOpenModal()}>
             <Plus className="w-4 h-4 mr-2" />
-            Nuevo Tipo de Puntaje
+            Nuevo Puntaje
           </Button>
         </div>
       </div>

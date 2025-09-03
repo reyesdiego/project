@@ -149,6 +149,18 @@ const AgentPointsDashboardPage: React.FC = () => {
          const minPercentage = 20; // Minimum percentage for losers
          const calculatedWidth = Math.max(minPercentage, percentage);
          
+         // Ensure minimum width for mobile devices with reduced variation
+         let mobileMinWidth;
+         if (window.innerWidth < 640) {
+           // On mobile: reduce width variation to keep rows readable
+           const mobileMin = 50; // 70% minimum on mobile
+           const mobileMax = 95; // 95% maximum on mobile
+           const mobileWidth = mobileMin + (percentage - minPercentage) * (mobileMax - mobileMin) / (100 - minPercentage);
+           mobileMinWidth = Math.max(mobileMin, Math.min(mobileMax, mobileWidth));
+         } else {
+           mobileMinWidth = calculatedWidth;
+         }
+         
                        return (
              <div
                key={agent.agent_id}
@@ -158,9 +170,9 @@ const AgentPointsDashboardPage: React.FC = () => {
                style={{
                  backgroundColor,
                  color: textColor,
-                 width: `${calculatedWidth}%`,
-                 minHeight: '40px',
-                 maxHeight: '60px'
+                 width: `${mobileMinWidth}%`,
+                 minHeight: '44px',
+                 maxHeight: '49px'
                }}
              >
              {/* Position Badge with Trophy for top 3 */}
@@ -187,7 +199,13 @@ const AgentPointsDashboardPage: React.FC = () => {
                <div className="flex items-center justify-between">
                  <div className="min-w-0 flex-1">
                    <h3 className="text-lg font-semibold truncate">
-                     <b>{agent.agent_name}</b>
+                     <b>
+                       {/* Show only first name on mobile, full name on desktop */}
+                       <span className="hidden sm:inline">{agent.agent_name}</span>
+                       <span className="sm:hidden">
+                         {agent.agent_name.split(' ')[0]}
+                       </span>
+                     </b>
                    </h3>
                    {/* <p className="text-xs opacity-90 truncate">
                      {agent.total_scores} evaluaciones
@@ -195,10 +213,14 @@ const AgentPointsDashboardPage: React.FC = () => {
                  </div>
                  <div className="text-right flex-shrink-0 ml-4">
                    <div className="text-xl font-bold">
-                     <span className="text-xs opacity-90"><b>{percentage > 0 
-                       ? percentage.toFixed(1)
-                       : '0.0'
-                     } %</b></span>&nbsp;&nbsp;<span>{agent.total_points.toLocaleString()}</span>
+                     {/* Show percentage only on desktop */}
+                     <span className="hidden sm:inline text-xs opacity-90">
+                       <b>{percentage > 0 
+                         ? percentage.toFixed(1)
+                         : '0.0'
+                       } %</b>&nbsp;&nbsp;
+                     </span>
+                     <span>{agent.total_points.toLocaleString()}</span>
                    </div>
                    {/* <div className="text-xs opacity-90">
                    <b>{percentage > 0 
@@ -358,7 +380,7 @@ const AgentPointsDashboardPage: React.FC = () => {
         setDirection(1);
         setCurrentComponent((prev) => (prev + 1) % components.length);
       }
-    }, 10000);
+    }, 15000);
 
     // Cleanup function to clear the interval
     return () => clearInterval(interval);

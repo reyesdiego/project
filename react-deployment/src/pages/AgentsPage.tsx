@@ -3,22 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Plus, Search, Edit, Trash2, UserCheck } from 'lucide-react';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAgents, createAgent, updateAgent, deleteAgent } from '../store/slices/agentsSlice';
+import { Agent } from '../services/api';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-
-interface Agent {
-  id: string;
-  first_name: string;
-  last_name: string;
-  area: string;
-  position: string;
-  hire_date: string;
-  email?: string;
-  phone?: string;
-  is_active: boolean;
-}
 
 const AgentsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,12 +18,10 @@ const AgentsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [deletingAgent, setDeletingAgent] = useState<Agent | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    area: '',
-    position: '',
-    hire_date: '',
     email: '',
     phone: '',
     is_active: true,
@@ -46,8 +33,7 @@ const AgentsPage: React.FC = () => {
 
   const filteredAgents = agents.filter(agent =>
     `${agent.first_name} ${agent.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    agent.area.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    agent.position.toLowerCase().includes(searchTerm.toLowerCase())
+    (agent.email?.toLowerCase() ?? '').includes(searchTerm.toLowerCase())
   );
 
   const handleOpenModal = (agent?: Agent) => {
@@ -56,9 +42,6 @@ const AgentsPage: React.FC = () => {
       setFormData({
         first_name: agent.first_name,
         last_name: agent.last_name,
-        area: agent.area,
-        position: agent.position,
-        hire_date: agent.hire_date,
         email: agent.email || '',
         phone: agent.phone || '',
         is_active: agent.is_active,
@@ -68,9 +51,6 @@ const AgentsPage: React.FC = () => {
       setFormData({
         first_name: '',
         last_name: '',
-        area: '',
-        position: '',
-        hire_date: '',
         email: '',
         phone: '',
         is_active: true,
@@ -82,6 +62,7 @@ const AgentsPage: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingAgent(null);
+    setError(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -94,6 +75,7 @@ const AgentsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     try {
       if (editingAgent) {
@@ -102,8 +84,9 @@ const AgentsPage: React.FC = () => {
         await dispatch(createAgent(formData));
       }
       handleCloseModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving agent:', error);
+      setError(error.message || 'Error al guardar el agente');
     }
   };
 
@@ -170,15 +153,6 @@ const AgentsPage: React.FC = () => {
                   Agente
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Área
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Cargo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Fecha Ingreso
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Estado
                 </th>
                 {canEdit && (
@@ -210,15 +184,7 @@ const AgentsPage: React.FC = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {agent.area}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {agent.position}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(agent.hire_date).toLocaleDateString()}
-                  </td>
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       agent.is_active
@@ -265,6 +231,11 @@ const AgentsPage: React.FC = () => {
         maxWidth="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -294,59 +265,19 @@ const AgentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Área
-              </label>
-              <input
-                type="text"
-                name="area"
-                value={formData.area}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Cargo
-              </label>
-              <input
-                type="text"
-                name="position"
-                value={formData.position}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Fecha de Ingreso
-            </label>
-            <input
-              type="date"
-              name="hire_date"
-              value={formData.hire_date}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email (opcional)
+                Email
               </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               />
             </div>

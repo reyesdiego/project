@@ -29,7 +29,7 @@ const agentSchema = Joi.object({
   first_name: Joi.string().min(2).max(50).required(),
   last_name: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().optional(),
-  phone: Joi.string().optional(),
+  phone: Joi.string().allow('', null).optional(),
   is_active: Joi.boolean().default(true)
 });
 

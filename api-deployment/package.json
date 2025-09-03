@@ -6,9 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest",
-    "migrate": "node src/migrations/run-migrations.js",
-    "migrate:create": "node src/migrations/create-migration.js"
+    "test": "jest"
   },
   "keywords": ["express", "api", "scoreteam"],
   "author": "",
