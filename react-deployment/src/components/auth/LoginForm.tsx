@@ -57,7 +57,7 @@ const LoginForm: React.FC = () => {
             Iniciar Sesión
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Accede a <span className="font-semibold text-blue-600">ScoreTeam</span>
+            Accede a <span className="font-semibold text-blue-600">Namai Score</span>
           </p>
         </div>
 
@@ -128,7 +128,7 @@ const LoginForm: React.FC = () => {
               </Button>
             </div>
 
-            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            {/* <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                 <strong>Credenciales de prueba:</strong>
               </p>
@@ -136,7 +136,7 @@ const LoginForm: React.FC = () => {
                 Usuario: <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded">admin</code><br />
                 Contraseña: <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded">admin123</code>
               </p>
-            </div>
+            </div> */}
           </div>
         </form>
       </div>
