@@ -69,12 +69,23 @@ const ScoreTypesPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : 
-              type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
-              value
-    }));
+    
+    if (name === 'score_value' && type === 'number') {
+      const numValue = Number(value);
+      // Round to nearest 0.05 (multiple of 5 cents)
+      const roundedValue = Math.round(numValue * 20) / 20;
+      setFormData(prev => ({
+        ...prev,
+        [name]: roundedValue
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'number' ? Number(value) : 
+                type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
+                value
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -271,9 +282,10 @@ const ScoreTypesPage: React.FC = () => {
               name="score_value"
               value={formData.score_value}
               onChange={handleChange}
+              step="0.05"
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-              placeholder="Puede ser positivo o negativo"
+              placeholder="Ej: 5.00, 2.50, -1.25"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Ingresa un valor positivo para premios o negativo for penalizaciones
