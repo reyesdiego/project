@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   BarChart,
@@ -9,7 +9,10 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  Legend
+  Legend,
+  PieChart,
+  Pie,
+  Sector
 } from 'recharts';
 import { Trophy, Maximize2, Minimize2, Crown } from 'lucide-react';
 import { AppDispatch, RootState } from '../store/store';
@@ -302,6 +305,90 @@ const AgentPointsDashboardPage: React.FC = () => {
      )}
    </div>);
 
+   /* Pie Chart */
+   const AgentPieChart = React.memo(() => {
+     // Memoize pie data to prevent unnecessary recalculations
+     const pieData = useMemo(() => {
+       return agentPoints.slice(0, 10).map((agent, index) => ({
+         name: agent.agent_name.split(' ')[0], // First name only
+         value: agent.total_points,
+         fullName: agent.agent_name,
+         color: COLORS[index % COLORS.length]
+       }));
+     }, [agentPoints]);
+
+     // Memoize custom tooltip component
+     const CustomPieTooltip = useMemo(() => {
+       return ({ active, payload }: any) => {
+         if (active && payload && payload.length) {
+           const data = payload[0].payload;
+           return (
+             <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+               <p className="font-semibold text-gray-900 dark:text-white">{data.fullName}</p>
+               <p className="text-sm text-gray-600 dark:text-gray-400">
+                 Puntos: <span className="font-bold">{data.value.toLocaleString()}</span>
+               </p>
+             </div>
+           );
+         }
+         return null;
+       };
+     }, []);
+
+     return (
+       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+         <div className="mb-6">
+           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+             🥧 Top 10 Agentes
+           </h2>
+           <p className="text-gray-600 dark:text-gray-400">
+             Agentes con mayor puntuación
+           </p>
+         </div>
+
+         {agentPoints.length > 0 ? (
+           <div className={isFullscreen ? "h-[calc(100vh-400px)]" : "h-[500px]"}>
+             <ResponsiveContainer width="100%" height="100%">
+               <PieChart>
+                 <Pie
+                   data={pieData}
+                   cx="50%"
+                   cy="50%"
+                   labelLine={false}
+                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                   outerRadius={isFullscreen ? 180 : 140}
+                   innerRadius={isFullscreen ? 80 : 60}
+                   fill="#8884d8"
+                   dataKey="value"
+                 >
+                   {pieData.map((entry, index) => (
+                     <Cell key={`cell-${index}`} fill={entry.color} />
+                   ))}
+                 </Pie>
+                 <Tooltip content={<CustomPieTooltip />} />
+                 <Legend 
+                   verticalAlign="bottom" 
+                   height={36}
+                   formatter={(value, entry: any) => (
+                     <span style={{ color: entry.color }}>
+                       {value}
+                     </span>
+                   )}
+                 />
+               </PieChart>
+             </ResponsiveContainer>
+           </div>
+         ) : (
+           <div className="text-center py-12">
+             <div className="text-gray-500 dark:text-gray-400">
+               No hay datos de puntos disponibles
+             </div>
+           </div>
+         )}
+       </div>
+     );
+   });
+
    /* Agent List */
    const AgentList = () => (
    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -360,12 +447,14 @@ const AgentPointsDashboardPage: React.FC = () => {
   const components = [
     AgentsRankingTable,
     AgentBarChart,
+    AgentPieChart,
     AgentList
   ]
   const slides = [
     { key: "first",  node: <AgentsRankingTable /> },
     { key: "second", node: <AgentBarChart /> },
-    { key: "third",  node: <AgentList /> },
+    { key: "third",  node: <AgentPieChart /> },
+    { key: "fourth", node: <AgentList /> },
   ];
   const variants = {
     initial: (dir: 1 | -1) => ({ opacity: 0, x: 40 * dir }),
