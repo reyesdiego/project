@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="trophyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="baseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Trophy Cup -->
+  <path d="M8 6 L8 12 C8 14.2 9.8 16 12 16 L20 16 C22.2 16 24 14.2 24 12 L24 6 L8 6 Z" 
+        fill="url(#trophyGradient)" 
+        stroke="#B8860B" 
+        stroke-width="0.5"/>
+  
+  <!-- Trophy Handles -->
+  <path d="M8 8 C6 8 4 10 4 12 C4 14 6 16 8 16" 
+        fill="none" 
+        stroke="url(#trophyGradient)" 
+        stroke-width="1.5" 
+        stroke-linecap="round"/>
+  <path d="M24 8 C26 8 28 10 28 12 C28 14 26 16 24 16" 
+        fill="none" 
+        stroke="url(#trophyGradient)" 
+        stroke-width="1.5" 
+        stroke-linecap="round"/>
+  
+  <!-- Trophy Base -->
+  <rect x="10" y="16" width="12" height="3" 
+        fill="url(#baseGradient)" 
+        rx="1"/>
+  
+  <!-- Trophy Stand -->
+  <rect x="14" y="19" width="4" height="6" 
+        fill="url(#baseGradient)" 
+        rx="1"/>
+  
+  <!-- Base Platform -->
+  <rect x="6" y="25" width="20" height="2" 
+        fill="url(#baseGradient)" 
+        rx="1"/>
+  
+  <!-- Star on Trophy -->
+  <path d="M16 4 L17 7 L20 7 L17.5 9 L18.5 12 L16 10 L13.5 12 L14.5 9 L12 7 L15 7 Z" 
+        fill="#FFD700" 
+        stroke="#B8860B" 
+        stroke-width="0.3"/>
+  
+  <!-- Points/Score Indicator -->
+  <circle cx="26" cy="6" r="3" 
+          fill="#10B981" 
+          stroke="#059669" 
+          stroke-width="0.5"/>
+  <text x="26" y="8" 
+        text-anchor="middle" 
+        font-family="Arial, sans-serif" 
+        font-size="4" 
+        font-weight="bold" 
+        fill="white">P</text>
+</svg>
