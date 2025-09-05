@@ -38,7 +38,7 @@ export const fetchAgentPointsHistory = createAsyncThunk(
       // Calculate points for each agent
       const agentPointsData: AgentPoints[] = activeAgents.map(agent => {
         const agentScores = scores.filter(score => score.agent_id === agent.id);
-        const totalPoints = agentScores.reduce((sum, score) => sum + (score.score_type?.score_value || 0), 0);
+        const totalPoints = agentScores.reduce((sum, score) => sum + Number(score.score_type?.score_value || 0), 0);
         const totalScores = agentScores.length;
         const avgScore = totalScores > 0 ? Math.round(totalPoints / totalScores) : 0;
         const lastScoreDate = agentScores.length > 0 ? agentScores[0].score_date : '';

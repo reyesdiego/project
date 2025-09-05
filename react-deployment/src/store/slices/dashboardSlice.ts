@@ -122,12 +122,12 @@ export const fetchAgentEvolution = createAsyncThunk(
           const month = new Date(score.score_date).getMonth() + 1;
           const existing = acc.find(item => item.month === month);
           if (existing) {
-            existing.total_score += score.score_type?.score_value || 0;
+            existing.total_score += Number(score.score_type?.score_value || 0);
             existing.score_count += 1;
           } else {
             acc.push({
               month,
-              total_score: score.score_type?.score_value || 0,
+              total_score: Number(score.score_type?.score_value || 0),
               score_count: 1
             });
           }

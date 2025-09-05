@@ -115,7 +115,7 @@ const getMonthlyScores = async (req, res) => {
         aggregatedData[agentName][scoreMonth] = 0;
       }
       
-      aggregatedData[agentName][scoreMonth] += scoreValue;
+      aggregatedData[agentName][scoreMonth] += Number(scoreValue);
     });
 
     // Transform to the expected format
@@ -159,12 +159,12 @@ const getScoreTypesDistribution = async (req, res) => {
       
       if (existing) {
         existing.count += 1;
-        existing.total_value += score.score_type_value || 0;
+        existing.total_value += Number(score.score_type_value || 0);
       } else {
         acc.push({
           name: scoreTypeName,
           count: 1,
-          total_value: score.score_type_value || 0
+          total_value: Number(score.score_type_value || 0)
         });
       }
       return acc;
@@ -202,7 +202,7 @@ const getAgentComparison = async (req, res) => {
       
       if (existing) {
         existing.total_scores += 1;
-        existing.total_points += score.score_type_value || 0;
+        existing.total_points += Number(score.score_type_value || 0);
         existing.avg_score = existing.total_points / existing.total_scores;
         if (new Date(score.score_date) > new Date(existing.last_score_date)) {
           existing.last_score_date = score.score_date;
@@ -211,8 +211,8 @@ const getAgentComparison = async (req, res) => {
         acc.push({
           agent_name: agentName,
           total_scores: 1,
-          total_points: score.score_type_value || 0,
-          avg_score: score.score_type_value || 0,
+          total_points: Number(score.score_type_value || 0),
+          avg_score: Number(score.score_type_value || 0),
           last_score_date: score.score_date
         });
       }

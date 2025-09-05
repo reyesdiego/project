@@ -23,5 +23,15 @@ export default defineConfig(({ mode }) => {
       // Expose env variables to the client
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
     },
+    server: {
+      host: true, // Allow external connections
+      allowedHosts: [
+        'localhost',
+        '127.0.0.1',
+        '.ngrok.io', // Allow all ngrok subdomains
+        '.ngrok-free.app', // Allow ngrok free app domains
+        '.ngrok.app', // Allow ngrok app domains
+      ],
+    },
   };
 });

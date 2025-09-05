@@ -171,8 +171,8 @@ const AgentPointsDashboardPage: React.FC = () => {
                  backgroundColor,
                  color: textColor,
                  width: `${mobileMinWidth}%`,
-                 minHeight: '44px',
-                 maxHeight: '49px'
+                 minHeight: '39px',
+                 maxHeight: '44px'
                }}
              >
              {/* Position Badge with Trophy for top 3 */}
